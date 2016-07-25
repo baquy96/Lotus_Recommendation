@@ -1,8 +1,6 @@
 from CreateTable import *
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from oauth2client.client import GoogleCredentials
-import timeit
 
 
 def getMedian(alist):
@@ -10,7 +8,6 @@ def getMedian(alist):
     if alist == []:
         return []
     blist = sorted(alist, key=lambda x: (x is None, x))
-
     k = -1
     while blist[k] == None:
         k -= 1
@@ -49,7 +46,6 @@ def normalizeColumn(service, col):
     return col
 
 def normalize():
-    start = timeit.default_timer()
     credentials = GoogleCredentials.get_application_default()
     bigquery_service = build('bigquery', 'v2', credentials=credentials)
     listColumn = {'customer_id': [], 'sku': [], 'sales': [], 'views': [], 'carts': [], 'sales_effective_rate': [], 'rating': [], 'comments': []}
@@ -60,42 +56,41 @@ def normalize():
         col += [field['v'] for field in row['f']]
         listColumn['customer_id'] += [col[0]]
         listColumn['sku'] += [col[1]]
-        if col[2] != None:
+        if col[2] is not None:
             listColumn['sales'] += [float(col[2])]
         else:
             listColumn['sales'] += [col[2]]
 
-        if col[3] != None:
+        if col[3] is not None:
             listColumn['views'] += [float(col[3])]
         else:
             listColumn['views'] += [col[3]]
 
-
-        if col[4] != None:
+        if col[4] is not None:
             listColumn['carts'] += [float(col[4])]
         else:
             listColumn['carts'] += [col[4]]
 
-        if col[5] != None:
+        if col[5] is not None:
             listColumn['sales_effective_rate'] += [float(col[5])]
         else:
             listColumn['sales_effective_rate'] += [col[5]]
 
-        if col[6] != None:
+        if col[6] is not None:
             listColumn['rating'] += [float(col[6])]
         else:
             listColumn['rating'] += [col[6]]
 
-        if col[7] != None:
+        if col[7] is not None:
             listColumn['comments'] += [float(col[7])]
         else:
             listColumn['comments'] += [col[7]]
 
+    resultList = {}
     for col in listColumn:
         if col != 'customer_id' and col != 'sku':
-            listColumn[col] += normalizeColumn(bigquery_service, listColumn[col])
-    stop = timeit.default_timer()
-    print(stop - start)
-    return listColumn
+            resultList[col] = normalizeColumn(bigquery_service, listColumn[col])
+        else:
+            resultList[col] = listColumn[col]
 
-print(normalize())
+    return resultList
