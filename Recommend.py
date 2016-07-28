@@ -86,7 +86,7 @@ def recommend(data, user, k):
                                               neighborRatings[artist] * \
                                               weight
     # now make list from dictionary and only get the first k items
-    recommendations = list(recommendations.items())[k]
+    recommendations = list(recommendations.items())[:k]
     recommendations = [(u, v)
                        for (u, v) in recommendations]
     # finally sort and return
@@ -117,6 +117,7 @@ def createData():
 
 def result():
     data = createData()
+    print(data)
     for user in data.keys():
         print(recommend(data, user, 10))
 
