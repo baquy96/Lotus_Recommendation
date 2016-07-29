@@ -1,7 +1,7 @@
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from oauth2client.client import GoogleCredentials
-from apiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload
 
 from CreateTable import create
 from Normalize import normalize
@@ -231,23 +231,17 @@ def result():
         check = False
         for user in data.keys():
             tmp = recommend(data, user, k)
-            print(tmp)
             if tmp != []:
                 check = True
-                res = {}
                 for (sku, distance) in tmp:
-                    res['customer_id'] = user
-                    res['sku'] = sku
-                    res['distance'] = distance
-                    f.write(str(res))
+                    res = '{\'customer_id\': \'' + user + '\', \'sku\': \'' + sku + '\', \'distance\': ' + str(
+                        distance) + '}'
+                    f.write(res)
                     f.write('\n')
+        f.close()
         if check:
             createTable(bigquery_service, dataset_id)
             insertValues(bigquery_service, dataset_id)
-        f.close()
-
-
-        print(dataset_id, ': Success')
 
 
 result()
